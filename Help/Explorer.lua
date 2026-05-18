@@ -1,11 +1,3 @@
-    --[[
-        Dex++
-        Version 3.1
-        
-        Developed by Chillz
-        Decompiler fixed + rspy plugin + adonis bypass by mcdaggitt,
-        Dex++ is a revival of Moon's Dex, made to fulfill Moon's Dex prophecy.
-    ]]
 
     local selection
     local nodes = {}
@@ -15306,42 +15298,23 @@
             end
 
             local function close()
-                tweenS:Create(titleText,progressTI,{TextTransparency = 1}):Play()
-                tweenS:Create(descText,progressTI,{TextTransparency = 1}):Play()
-                tweenS:Create(versionText,progressTI,{TextTransparency = 1}):Play()
-                tweenS:Create(creatorText,progressTI,{TextTransparency = 1}):Play()
-                tweenS:Create(statusText,progressTI,{TextTransparency = 1}):Play()
-                tweenS:Create(progressBar,progressTI,{BackgroundTransparency = 1}):Play()
-                tweenS:Create(progressBar.Bar,progressTI,{BackgroundTransparency = 1}):Play()
-                tweenS:Create(progressBar.ImageLabel,progressTI,{ImageTransparency = 1}):Play()
-
-                tweenNumber(100,TweenInfo.new(0.4,Enum.EasingStyle.Back,Enum.EasingDirection.In),function(val)
-                    val = val/250
-                    local start = NumberSequenceKeypoint.new(0,0)
-                    local a1 = NumberSequenceKeypoint.new(0.6+val,0)
-                    local a2 = NumberSequenceKeypoint.new(math.min(1,0.601+val),1)
-                    if a1.Time == a2.Time then a2 = a1 end
-                    local goal = NumberSequenceKeypoint.new(1,a1 == a2 and 0 or 1)
-                    holderGradient.Transparency = NumberSequence.new({start,a1,a2,goal})
+                local ti = TweenInfo.new(0.15)
+            
+                for _,v in ipairs({
+                    titleText,
+                    descText,
+                    versionText,
+                    creatorText,
+                    statusText
+                }) do
+                    tweenS:Create(v,ti,{TextTransparency = 1}):Play()
+                end
+            
+                tweenS:Create(progressBar,ti,{BackgroundTransparency = 1}):Play()
+            
+                task.delay(0.18,function()
+                    gui:Destroy()
                 end)
-
-                fastwait(0.5)
-                gui.Main.BackgroundTransparency = 1
-                outlinesGradient.Rotation = 30
-
-                tweenNumber(100,ti,function(val)
-                    val = val/100
-                    local start = NumberSequenceKeypoint.new(0,1)
-                    local a1 = NumberSequenceKeypoint.new(val,1)
-                    local a2 = NumberSequenceKeypoint.new(math.min(1,val+math.min(0.05,val)),0)
-                    if a1.Time == a2.Time then a2 = a1 end
-                    local goal = NumberSequenceKeypoint.new(1,a1 == a2 and 1 or 0)
-                    outlinesGradient.Transparency = NumberSequence.new({start,a1,a2,goal})
-                    holderGradient.Transparency = NumberSequence.new({start,a1,a2,goal})
-                end)
-
-                fastwait(0.45)
-                gui:Destroy()
             end
 
             return {SetProgress = setProgress, Close = close, Object = gui}
@@ -15752,7 +15725,6 @@
                 task.wait(0.2)
                 intro.Close()
             end)
-
 
             -- Init window system, create main menu, show explorer and properties
             Lib.Window.Init()
