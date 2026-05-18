@@ -14298,13 +14298,13 @@
         Main.Elevated = false
         Main.AllowDraggableOnMobile = true
         Main.MissingEnv = {}
-        Main.Version = "3.1"
+        Main.Version = "3.2"
         Main.Mouse = plr:GetMouse()
         Main.AppControls = {}
         Main.Apps = Apps
         Main.MenuApps = {}
-        Main.GitName = "AZYsGithub"
-        Main.RepoName = "DexPlusPlus"
+        Main.GitName = "akbarkidds"
+        Main.RepoName = "Dex Explorer"
         Main.GitRepoName = Main.GitName.."/"..Main.RepoName
 
         Main.DisplayOrders = {
