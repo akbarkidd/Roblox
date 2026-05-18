@@ -15748,10 +15748,11 @@
 
             -- Done
             intro.SetProgress("Complete",1)
-            coroutine.wrap(function()
-                Lib.FastWait(1.25)
+            task.spawn(function()
+                task.wait(0.2)
                 intro.Close()
-            end)()
+            end)
+
 
             -- Init window system, create main menu, show explorer and properties
             Lib.Window.Init()
