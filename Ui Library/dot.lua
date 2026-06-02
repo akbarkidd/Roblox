@@ -246,8 +246,6 @@ end
 -- ============================================================
 local loadingScreen = CreateLoadingScreen()
 loadingScreen:PlayAndWait()   -- tunggu animasi selesai
-loadingScreen:FadeOut()
-task.wait(2)
 -- ============================================================
 --  LIBRARY FLUENT UI  (kode asli tidak diubah sama sekali)
 -- ============================================================
@@ -5411,5 +5409,5 @@ end
 if getgenv then
 	getgenv().Fluent = Library
 end
-
+loadingScreen:FadeOut()
 return Library
