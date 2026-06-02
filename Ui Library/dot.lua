@@ -4161,7 +4161,7 @@ Components.Window = function(Config)
 	Window.ContainerPosMotor:onStep(function(Value)
 		Window.ContainerHolder.Position = UDim2.fromOffset(Config.TabWidth + 26, Value)
 	end)
-	local ToggleIconMobile = function(windowVisible)
+	local ToggleIconMobile = function(windowVisible, icon)
 		local ParentScreenx = ParentScreen
 		local screenGui = ParentScreenx:FindFirstChild("MobileToggleGui")
 		if not screenGui then
@@ -4178,7 +4178,7 @@ Components.Window = function(Config)
 			button.Position = UDim2.new(0.075, 0, 0.25, 0)
 			button.AnchorPoint = Vector2.new(1, 0)
 			button.BackgroundTransparency = 1
-			button.Image = "rbxassetid://93817563422121"
+			button.Image = icon or "rbxassetid://93817563422121"
 			button.BackgroundTransparency = 1
 			button.ImageTransparency = 0
 			button.Parent = screenGui
@@ -4189,12 +4189,7 @@ Components.Window = function(Config)
 			button.MouseButton1Click:Connect(function()
 				windowVisible = not windowVisible
 				Window.Root.Visible = windowVisible
-
-				if windowVisible then
-					button.Image = "rbxassetid://93817563422121"
-				else
-					button.Image = "rbxassetid://11218499209"
-				end
+				button.Image = icon or "rbxassetid://93817563422121"
 			end)
 			Window.Root.AncestryChanged:Connect(function(_, parent)
 				if parent == nil then
@@ -4336,9 +4331,9 @@ Components.Window = function(Config)
 		Window.Minimized = not Window.Minimized
 		Window.Root.Visible = not Window.Minimized
 		if Window.Minimized then
-			ToggleIconMobile(true)
+			ToggleIconMobile(true, "rbxassetid://93817563422121")
 		else
-			ToggleIconMobile(false)
+			ToggleIconMobile(false, "rbxassetid://11218499209")
 		end
 		if not MinimizeNotif then
 			MinimizeNotif = true
