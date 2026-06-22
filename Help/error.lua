@@ -47,14 +47,24 @@ local TeleportCheck = false
 game.Players.LocalPlayer.OnTeleport:Connect(function(State)
 	if not TeleportCheck and queueteleport then
 		TeleportCheck = true
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/akbarkidd/Roblox/refs/heads/main/Help/error.lua'))()")
+		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/akbarkidd/Roblox/refs/heads/main/Help/az.lua'))()")
 	end
 end)
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
 
-game.Players.LocalPlayer.OnTeleport:Connect(function(state)
-    task.wait(2)
-    join()
-end)
+local function onErrorMessageChanged(errorMessage)
+    if errorMessage and errorMessage ~= "" then
+        print("Error detected: " .. errorMessage)
+        if game.Players.LocalPlayer then
+            wait()
+            game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+        end
+    end
+end
+
+game:GetService("GuiService").ErrorMessageChanged:Connect(onErrorMessageChanged)
 
 local File = pcall(function()
    AllIDs = game:GetService('HttpService'):JSONDecode(readfile("NotSameServers.json"))
@@ -5621,7 +5631,9 @@ function Optimizer.Update_Trainer_Logic(pData)
                     currentRarity = iData.Rarity or currentRarity
                     if iData.Template then currentImage = GetIcon(iData.Template) end
                 end
-                if pData.GachaLevel[name] then
+                if pData.GachaLevel[name] and name == "MagicEyes" then
+                    currentLvl = (pData.GachaLevel[name][tostring(equippedIndex)] or 0) + 1
+                else
                     currentLvl = pData.GachaLevel[name][tostring(equippedIndex)] or 0
                 end
             end
