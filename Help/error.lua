@@ -47,7 +47,7 @@ local TeleportCheck = false
 game.Players.LocalPlayer.OnTeleport:Connect(function(State)
 	if not TeleportCheck and queueteleport then
 		TeleportCheck = true
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/akbarkidd/Roblox/refs/heads/main/Help/az.lua'))()")
+		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/akbarkidd/Roblox/refs/heads/main/Help/error.lua'))()")
 	end
 end)
 --[[
