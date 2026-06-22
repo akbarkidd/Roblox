@@ -3257,28 +3257,6 @@ LoadAllUpgradeModules()
 _upgradeGroup = nil
 _totalItems = 0
 
-local function GetCurrentLevel(name)
-    local pData = getgenv().PlayerData
-
-    if not pData then
-        return 0
-    end
-
-    local equippedIndex = pData.Attributes[name]
-
-    if not equippedIndex then
-        return 0
-    end
-
-    local gacha = pData.GachaLevel[name]
-
-    if not gacha then
-        return 0
-    end
-
-    return gacha[tostring(equippedIndex)] or 0
-end
-
 function CreateUpgradeToggle(name, mod, isGachaUpgrade)
     if _totalItems % 2 == 0 then
         _upgradeGroup = FarmTab:Group({})
@@ -3320,7 +3298,7 @@ function CreateUpgradeToggle(name, mod, isGachaUpgrade)
                                 if pData.GachaLevel and pData.Attributes then
                                     local equippedIndex = pData.Attributes[name]
                                     if equippedIndex and pData.GachaLevel[name] then
-                                        currentLvl = pData.GachaLevel[name][tostring(equippedIndex)] or 0
+                                        currentLvl = (pData.GachaLevel[name][tostring(equippedIndex)] or 0) + 1
                                     end
                                     if currentLvl == 0 then currentLvl = 1 end
                                     tokenKey = mod.UpgradeMaterial or (name.."Token")
@@ -5631,10 +5609,8 @@ function Optimizer.Update_Trainer_Logic(pData)
                     currentRarity = iData.Rarity or currentRarity
                     if iData.Template then currentImage = GetIcon(iData.Template) end
                 end
-                if pData.GachaLevel[name] and name == "MagicEyes" then
+                if pData.GachaLevel[name] then
                     currentLvl = (pData.GachaLevel[name][tostring(equippedIndex)] or 0) + 1
-                else
-                    currentLvl = pData.GachaLevel[name][tostring(equippedIndex)] or 0
                 end
             end
             if currentLvl == 0 then currentLvl = 1 end
