@@ -47,7 +47,7 @@ local TeleportCheck = false
 game.Players.LocalPlayer.OnTeleport:Connect(function(State)
 	if not TeleportCheck and queueteleport then
 		TeleportCheck = true
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/akbarkidd/Roblox/refs/heads/main/Help/error.lua'))()")
+		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/akbarkidd/Roblox/refs/heads/main/Help/error.lua?v=" .. math.random().."'))()")
 	end
 end)
 --[[
@@ -892,9 +892,9 @@ local ValidKeys = {"ANHUB-2025"} -- Key default untuk Free User
 UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/ANHub-Script/ANUI/refs/heads/main/dist/main.lua?v=" .. math.random()))()
 
 Window = UI:CreateWindow({
-    Title = "ANHub - Anime Weapon",
+    Title = "Anime Weapon",
     Icon = "rbxassetid://84366761557806",
-    Author = "Aditya Nugraha",
+    Author = "akbar kidds",
     Folder = "AnimeWeapons",
     Size = UDim2.fromOffset(580, 460),
     Acrylic = false,
@@ -1324,6 +1324,7 @@ function ResetMegaBossState()
     MegaBossState.IsActive = false
     MegaBossState.TargetZone = nil
     MegaBossState.ReturnZone = nil
+    MegaBossState.ReturnPosition = nil
     MegaBossState.BossDeadCheck = 0
     MegaBossState.PendingTargetZone = nil
     MegaBossState.PendingZoneDisplayName = nil
@@ -1416,10 +1417,15 @@ function LogicAutoFarm()
                         if MegaBossState.ReturnZone and MegaBossState.ReturnZone ~= currentMap then
                             if Reply and Reply.To then
                                 pcall(function() 
-                                    Reply.To("Zone Teleport", MegaBossState.ReturnZone) 
+                                    freeze(false)
+                                    Reply.To("Zone Teleport", MegaBossState.ReturnZone)
                                 end)
                             end
                             MegaBossState.ReturnZone = nil
+                        end
+                        if MegaBossState.ReturnPosition then
+                            hrp.Position = MegaBossState.ReturnPosition
+                            MegaBossState.ReturnPosition = nil
                         end
                     end
                 end
@@ -2597,6 +2603,28 @@ end)
 local AutoLeaveCooldown = {}
 local AutoLeavedState = {}
 
+function freeze(status)
+    local player = Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    hrp.Anchored = true
+    if status == true then
+        RunService.Heartbeat:Connect(function()
+            local params = RaycastParams.new()
+            params.FilterType = Enum.RaycastFilterType.Exclude
+            params.FilterDescendantsInstances = {character}
+            local pos = hrp.Position
+            local result = workspace:Raycast(pos, Vector3.new(0, -500, 0), params)
+            if result then
+                task.wait(2)
+                hrp.Anchored = false
+            else
+                hrp.Anchored = true
+            end
+        end)
+    end
+end
+freeze(true)
 if shared and shared.Events and shared.Events.Connect then
     local conn = shared.Events.Connect("Gamemode Data Replicate", function(gamemodeId, payload)
         if not Config.AutoLeave then return end
@@ -2608,6 +2636,7 @@ if shared and shared.Events and shared.Events.Connect then
         if AutoLeaveCooldown[gamemodeId] and (os.clock() - AutoLeaveCooldown[gamemodeId]) < 5 then return end
         AutoLeaveCooldown[gamemodeId] = os.clock()
         if Reply and Reply.To then
+            freeze(false)
             pcall(function()
                 Reply.To("Leave Gamemode", true)
             end)
@@ -2615,6 +2644,7 @@ if shared and shared.Events and shared.Events.Connect then
     end)
     TrackSharedConnection(conn)
     local conns = shared.Events.Connect("Gamemode Left", function(gamemodeId, payload)
+        freeze(false)
         local pData = getgenv().PlayerData
         IsTeleporting = true;
         IsLoadingConfig = true;
@@ -4733,7 +4763,9 @@ end
 task.spawn(function()
     local TCS = game:GetService("TextChatService")
     local ChatConnection = nil -- Variabel untuk menyimpan koneksi
-
+    local player = Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local hrp = character:WaitForChild("HumanoidRootPart")
     ChatConnection = TCS.MessageReceived:Connect(function(msgObj)
         if Window.Destroyed then -- Safety check
             if ChatConnection then ChatConnection:Disconnect() end
@@ -4783,6 +4815,7 @@ task.spawn(function()
 
                 if not MegaBossState.IsActive then
                     MegaBossState.ReturnZone = GetCurrentMapStatus()
+                    MegaBossState.ReturnPosition = hrp.Position + Vector3.new(0, 20, 0)
                 end
 
                 MegaBossState.TargetZone = targetZoneID
@@ -4835,6 +4868,7 @@ task.spawn(function()
 
                 if not MegaBossState.IsActive then
                     MegaBossState.ReturnZone = GetCurrentMapStatus()
+                    MegaBossState.ReturnPosition = hrp.Position + Vector3.new(0, 20, 0)
                 end
 
                 MegaBossState.TargetZone = pendingZone
