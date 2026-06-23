@@ -47,7 +47,7 @@ local TeleportCheck = false
 game.Players.LocalPlayer.OnTeleport:Connect(function(State)
 	if not TeleportCheck and queueteleport then
 		TeleportCheck = true
-		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/akbarkidd/Roblox/refs/heads/main/Help/error.lua?v=" .. math.random().."'))()")
+		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/akbarkidd/Roblox/refs/heads/main/Help/error.lua'))()")
 	end
 end)
 --[[
@@ -892,9 +892,9 @@ local ValidKeys = {"ANHUB-2025"} -- Key default untuk Free User
 UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/ANHub-Script/ANUI/refs/heads/main/dist/main.lua?v=" .. math.random()))()
 
 Window = UI:CreateWindow({
-    Title = "Anime Weapon",
+    Title = "ANHub - Anime Weapon",
     Icon = "rbxassetid://84366761557806",
-    Author = "akbar kidds",
+    Author = "Aditya Nugraha",
     Folder = "AnimeWeapons",
     Size = UDim2.fromOffset(580, 460),
     Acrylic = false,
@@ -1424,7 +1424,12 @@ function LogicAutoFarm()
                             MegaBossState.ReturnZone = nil
                         end
                         if MegaBossState.ReturnPosition then
-                            hrp.Position = MegaBossState.ReturnPosition
+                            task.wait(3)
+                            pcall(function()
+                                local pos = MegaBossState.ReturnPosition + Vector3.new(0, 10, 0)
+                                hrp.CFrame = CFrame.new(pos, MegaBossState.ReturnPosition)
+                                hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
+                            end)
                             MegaBossState.ReturnPosition = nil
                         end
                     end
