@@ -4540,13 +4540,6 @@ local function synsaveinstance(...)
             -- Ambil bytecode
             local bytecode = safe_get_bytecode(script)
             if not bytecode then
-                -- Fallback: coba decompile bawaan executor
-                if typeof(decompile) == "function" then
-                    local ok, result = pcall(decompile, script)
-                    if ok and type(result) == "string" and result ~= "" then
-                        return result
-                    end
-                end
                 return "-- Failed: tidak bisa ambil bytecode dari executor"
             end
     
