@@ -4458,13 +4458,21 @@ local function synsaveinstance(...)
     
         -- Helper: HTTP request
         local function http_request(opts)
-            local req = (syn and syn.request) or http_request or request
+            local req = (syn and syn.request) or request
                          or (http and http.request) or (fluxus and fluxus.request)
-            if not req then return nil end
+            if not req then 
+                warn("[USSI] ❌ No HTTP function")
+                return nil 
+            end
             local ok, res = pcall(req, opts)
-            if ok and res and res.StatusCode == 200 and res.Body and res.Body ~= "" then
+            if not ok then
+                warn("[USSI] ❌ HTTP error:", res)
+                return nil
+            end
+            if res and res.StatusCode == 200 and res.Body and res.Body ~= "" then
                 return res.Body
             end
+            warn("[USSI] ❌ HTTP bad response:", res and res.StatusCode)
             return nil
         end
     
