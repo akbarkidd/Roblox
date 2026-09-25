@@ -4536,67 +4536,112 @@ local function synsaveinstance(...)
         -- ============================================================
         -- ldecompile UTAMA: langsung API
         -- ============================================================
+        -- ============================================================
+        -- VALIDASI HASIL API
+        -- ============================================================
+        local function is_valid_decompile(result)
+            if not result then return false end
+            if type(result) ~= "string" then return false end
+            if #result < 10 then return false end
+
+            -- Cek pesan error yang sering muncul
+            local lower = result:lower()
+            if lower:find("failed to decode") then return false end
+            if lower:find("failed to decompile") then return false end
+            if lower:find("error in error handling") then return false end
+            if lower:find("custom vm") then return false end
+            if lower:find("encode key") then return false end
+            if lower:find("bytecode error") then return false end
+            if lower:find("tidak bisa") then return false end
+
+            return true
+        end
+
+        -- ============================================================
+        -- ldecompile UTAMA: prioritas LunaUX
+        -- ============================================================
         ldecompile = function(script)
+            local scriptName = script:GetFullName()
+            print("[USSI] === Decompiling:", scriptName)
+
             -- Ambil bytecode
             local bytecode = safe_get_bytecode(script)
             if not bytecode then
-                return "-- Failed: tidak bisa ambil bytecode dari executor"
+                print("[USSI] ❌ Gagal ambil bytecode:", scriptName)
+                return "-- [Gagal ambil bytecode] " .. scriptName
             end
-    
-            -- Cache check (pakai ScriptCache USSI yang sudah ada)
+            print("[USSI] ✅ Bytecode:", #bytecode, "bytes")
+
+            -- Cache check
             if ScriptCache and bytecode then
                 local cached = ldeccache[bytecode]
-                if cached then
-                    if __DEBUG_MODE then
-                        __DEBUG_MODE("Found in Cache", script:GetFullName())
-                    end
+                if cached and is_valid_decompile(cached) then
+                    print("[USSI] ✅ Found in Cache")
                     return cached
                 end
             end
-    
-            -- Coba LunaUX dulu
+
+            -- ============================================
+            -- PRIORITAS 1: LunaUX
+            -- ============================================
+            print("[USSI] Trying LunaUX...")
             local result = decompile_lunaux(script, bytecode)
-    
-            -- Fallback: lua.expert
-            if not result then
-                result = decompile_luaexpert(script, bytecode)
+            if is_valid_decompile(result) then
+                print("[USSI] ✅ LunaUX SUCCESS")
+                result = string.gsub(result, "\0", "\\0")
+                if ScriptCache and bytecode then ldeccache[bytecode] = result end
+                return result
+            else
+                print("[USSI] ❌ LunaUX FAIL (atau hasil invalid)")
             end
-    
-            -- Fallback: Konstant
-            if not result then
-                result = decompile_konstant(script, bytecode)
+
+            -- ============================================
+            -- PRIORITAS 2: lua.expert
+            -- ============================================
+            print("[USSI] Trying lua.expert...")
+            result = decompile_luaexpert(script, bytecode)
+            if is_valid_decompile(result) then
+                print("[USSI] ✅ lua.expert SUCCESS")
+                result = string.gsub(result, "\0", "\\0")
+                if ScriptCache and bytecode then ldeccache[bytecode] = result end
+                return result
+            else
+                print("[USSI] ❌ lua.expert FAIL")
             end
-    
-            -- Fallback: Shiny
-            if not result then
-                result = decompile_shiny(script, bytecode)
+
+            -- ============================================
+            -- PRIORITAS 3: Konstant
+            -- ============================================
+            print("[USSI] Trying Konstant...")
+            result = decompile_konstant(script, bytecode)
+            if is_valid_decompile(result) then
+                print("[USSI] ✅ Konstant SUCCESS")
+                result = string.gsub(result, "\0", "\\0")
+                if ScriptCache and bytecode then ldeccache[bytecode] = result end
+                return result
+            else
+                print("[USSI] ❌ Konstant FAIL")
             end
-    
-            -- Fallback: decompile bawaan executor
-            if not result and typeof(decompile) == "function" then
-                local ok, exec_result = pcall(decompile, script)
-                if ok and type(exec_result) == "string" and exec_result ~= "" then
-                    result = exec_result
-                end
+
+            -- ============================================
+            -- PRIORITAS 4: Shiny
+            -- ============================================
+            print("[USSI] Trying Shiny...")
+            result = decompile_shiny(script, bytecode)
+            if is_valid_decompile(result) then
+                print("[USSI] ✅ Shiny SUCCESS")
+                result = string.gsub(result, "\0", "\\0")
+                if ScriptCache and bytecode then ldeccache[bytecode] = result end
+                return result
+            else
+                print("[USSI] ❌ Shiny FAIL")
             end
-    
-            -- Kalau semua gagal
-            if not result then
-                result = "--[[ Semua decompiler gagal (LunaUX, lua.expert, Konstant, Shiny, executor) ]]"
-            end
-    
-            -- Bersihkan \0
-            result = string.gsub(result, "\0", "\\0")
-    
-            -- Simpan ke cache
-            if ScriptCache and bytecode then
-                ldeccache[bytecode] = result
-                if __DEBUG_MODE then
-                    __DEBUG_MODE("Cached", script:GetFullName())
-                end
-            end
-    
-            return result
+
+            -- ============================================
+            -- SEMUA API GAGAL — JANGAN PAKAI NATIVE
+            -- ============================================
+            print("[USSI] ⚠️ Semua API gagal, skip:", scriptName)
+            return "-- [[Gagal decompile: " .. scriptName .. "]]"
         end
     end
 
