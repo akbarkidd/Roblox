@@ -4590,10 +4590,10 @@ local function synsaveinstance(...)
             end
 
             -- ============================================
-            -- PRIORITAS 1: LunaUX
+            -- PRIORITAS 1:lua.expert
             -- ============================================
             print("[USSI] Trying LunaUX...")
-            local result = decompile_lunaux(script, bytecode)
+            local result = decompile_luaexpert(script, bytecode)
             if is_valid_decompile(result) then
                 print("[USSI] ✅ LunaUX SUCCESS")
                 result = string.gsub(result, "\0", "\\0")
@@ -4604,10 +4604,10 @@ local function synsaveinstance(...)
             end
 
             -- ============================================
-            -- PRIORITAS 2: lua.expert
+            -- PRIORITAS 2: LunaUX
             -- ============================================
             print("[USSI] Trying lua.expert...")
-            result = decompile_luaexpert(script, bytecode)
+			result = decompile_lunaux(script, bytecode)
             if is_valid_decompile(result) then
                 print("[USSI] ✅ lua.expert SUCCESS")
                 result = string.gsub(result, "\0", "\\0")
